@@ -1,11 +1,14 @@
 package jces1209.vu.page
 
+import jces1209.vu.wait
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable
-import jces1209.vu.wait
+import org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated
+import org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfAllElementsLocatedBy
 
 class BentoCommenting(
     private val driver: WebDriver
@@ -33,6 +36,23 @@ class BentoCommenting(
         Actions(driver)
             .sendKeys(comment)
             .perform()
+    }
+
+    override fun mentionAnyone() {
+        typeIn("@")
+        val usersToSkip = 1
+        val nameAttribute = "data-mention-name"
+        val userName = driver
+            .wait(visibilityOfAllElementsLocatedBy(By.cssSelector("[$nameAttribute]")))
+            .drop(usersToSkip)
+            .first()
+            .getAttribute(nameAttribute)
+        Actions(driver)
+            .sendKeys(Keys.ARROW_DOWN.repeat(usersToSkip))
+            .sendKeys(Keys.ENTER)
+            .perform()
+        val commentSection = By.cssSelector("[data-test-id='issue.activity.comment']")
+        driver.wait(textToBePresentInElementLocated(commentSection, "@$userName"))
     }
 
     override fun saveComment() {

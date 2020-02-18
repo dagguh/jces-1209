@@ -30,6 +30,10 @@ class ClassicCloudCommenting(
             .perform()
     }
 
+    override fun mentionAnyone() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun saveComment() {
         driver.findElement(By.id("issue-comment-add-submit")).click()
     }

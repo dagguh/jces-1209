@@ -72,7 +72,8 @@ class JiraCloudScenario : Scenario {
             meter = waterfallMeter,
             issueKeyMemory = issueKeyMemory,
             random = seededRandom,
-            commentProbability = 0.00f // 0.04f
+            commentProbability = 0.30f,
+            mentionProbability = 0.50f
         )
         val projectSummary = ProjectSummaryAction(
             jira = jira,
