@@ -9,10 +9,18 @@ import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable
 import org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated
 import org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfAllElementsLocatedBy
+import org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated
 
 class BentoCommenting(
     private val driver: WebDriver
 ) : Commenting {
+
+    private val commentBox = By.xpath("//*[contains(text(),'Add a comment…')]")
+
+    override fun available(): Boolean {
+        driver.wait(visibilityOfElementLocated(By.cssSelector("[data-test-id='issue-activity-feed.heading']")))
+        return driver.findElements(commentBox).isNotEmpty()
+    }
 
     override fun openEditor() {
         clickThePlaceholder()
@@ -32,7 +40,7 @@ class BentoCommenting(
     private fun findSaveButton() = driver.wait(elementToBeClickable(By.xpath("//*[contains(text(),'Save')]")))
 
     override fun typeIn(comment: String) {
-        driver.wait(elementToBeClickable(By.xpath("//*[contains(text(),'Add a comment…')]")))
+        driver.wait(elementToBeClickable(commentBox))
         Actions(driver)
             .sendKeys(comment)
             .perform()

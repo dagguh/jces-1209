@@ -46,6 +46,9 @@ class WorkAnIssue(
 
     private fun comment(issuePage: CloudIssuePage) {
         val commenting = issuePage.comment()
+        if (commenting.available().not()) {
+            return
+        }
         meter.measure(ADD_COMMENT) {
             commenting.openEditor()
             commenting.typeIn("abc def")

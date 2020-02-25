@@ -1,15 +1,19 @@
 package jces1209.vu.page
 
+import jces1209.vu.wait
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable
 import org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated
-import jces1209.vu.wait
 
 class ClassicCloudCommenting(
     private val driver: WebDriver
 ) : Commenting {
+
+    override fun available(): Boolean {
+        return true
+    }
 
     override fun openEditor() {
         driver

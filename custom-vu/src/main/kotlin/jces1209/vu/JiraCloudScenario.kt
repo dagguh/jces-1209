@@ -92,7 +92,7 @@ class JiraCloudScenario : Scenario {
             boardMemory = boardPages,
             issueKeyMemory = issueKeyMemory
         )
-        val exploreData = listOf(browseProjects, searchWithJql, browseBoards)
+        val exploreData = listOf(browseProjects, searchWithJql, browseBoards, workAnIssue)
         val spreadOut = mapOf(
             createIssue to 0,
             searchWithJql to 20,
