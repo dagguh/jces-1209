@@ -2,6 +2,7 @@ package jces1209.vu.action
 
 import com.atlassian.performance.tools.jiraactions.api.ADD_COMMENT
 import com.atlassian.performance.tools.jiraactions.api.ADD_COMMENT_SUBMIT
+import com.atlassian.performance.tools.jiraactions.api.ActionType
 import com.atlassian.performance.tools.jiraactions.api.SeededRandom
 import com.atlassian.performance.tools.jiraactions.api.VIEW_ISSUE
 import com.atlassian.performance.tools.jiraactions.api.WebJira
@@ -53,12 +54,18 @@ class WorkAnIssue(
             commenting.openEditor()
             commenting.typeIn("abc def")
             if (roll(mentionProbability)) {
-                commenting.mentionAnyone()
+                meter.measure(MENTION) {
+                    commenting.mentionAnyone()
+                }
             }
             meter.measure(ADD_COMMENT_SUBMIT) {
                 commenting.saveComment()
                 commenting.waitForTheNewComment()
             }
         }
+    }
+
+    companion object Types {
+        val MENTION = ActionType("Mention in a comment") {}
     }
 }
