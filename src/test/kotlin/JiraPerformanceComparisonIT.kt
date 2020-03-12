@@ -33,10 +33,13 @@ class JiraPerformanceComparisonIT {
     @Test
     fun shouldComparePerformance() {
         val pool = Executors.newCachedThreadPool()
+        val baseline = pool.submitWithLogContext("baseline") {
+            benchmark(File("jira-baseline.properties"))
+        }
         val experiment = pool.submitWithLogContext("experiment") {
             benchmark(File("jira-experiment.properties"))
         }
-        val results = listOf(experiment).map { it.get().prepareForJudgement(FullTimeline()) }
+        val results = listOf(baseline, experiment).map { it.get().prepareForJudgement(FullTimeline()) }
         FullReport().dump(
             results = results,
             workspace = workspace.isolateTest("Compare")
