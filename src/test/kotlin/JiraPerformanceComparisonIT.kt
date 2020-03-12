@@ -1,4 +1,5 @@
 import com.atlassian.performance.tools.concurrency.api.submitWithLogContext
+import com.atlassian.performance.tools.jiraactions.api.scenario.Scenario
 import com.atlassian.performance.tools.report.api.FullReport
 import com.atlassian.performance.tools.report.api.FullTimeline
 import com.atlassian.performance.tools.report.api.WaterfallHighlightReport
@@ -15,6 +16,7 @@ import jces1209.log.LogConfigurationFactory
 import jces1209.vu.JiraCloudScenario
 import org.apache.logging.log4j.core.config.ConfigurationFactory
 import org.junit.Test
+import jces1209.vu.JiraDcScenario
 import java.io.File
 import java.net.URI
 import java.nio.file.Paths
@@ -34,10 +36,10 @@ class JiraPerformanceComparisonIT {
     fun shouldComparePerformance() {
         val pool = Executors.newCachedThreadPool()
         val baseline = pool.submitWithLogContext("baseline") {
-            benchmark(File("jira-baseline.properties"))
+            benchmark(File("jira-baseline.properties"), JiraDcScenario::class.java)
         }
         val experiment = pool.submitWithLogContext("experiment") {
-            benchmark(File("jira-experiment.properties"))
+            benchmark(File("jira-experiment.properties"), JiraCloudScenario::class.java)
         }
         val results = listOf(baseline, experiment).map { it.get().prepareForJudgement(FullTimeline()) }
         FullReport().dump(
@@ -48,10 +50,11 @@ class JiraPerformanceComparisonIT {
     }
 
     private fun benchmark(
-        propertiesFile: File
+        propertiesFile: File,
+        scenario: Class<out Scenario>
     ): RawCohortResult {
         val properties = CohortProperties.load(propertiesFile)
-        val options = loadOptions(properties)
+        val options = loadOptions(properties, scenario)
         val cohort = properties.cohort
         val resultsTarget = workspace.directory.resolve("vu-results").resolve(cohort)
         val provisioned = benchmarkQuality
@@ -70,13 +73,16 @@ class JiraPerformanceComparisonIT {
         }
     }
 
-    private fun loadOptions(properties: CohortProperties): VirtualUserOptions {
+    private fun loadOptions(
+        properties: CohortProperties,
+        scenario: Class<out Scenario>
+    ): VirtualUserOptions {
         val target = VirtualUserTarget(
             webApplication = properties.jira,
             userName = properties.userName,
             password = properties.userPassword
         )
-        val behavior = benchmarkQuality.behave(JiraCloudScenario::class.java)
+        val behavior = benchmarkQuality.behave(scenario)
             .let { VirtualUserBehavior.Builder(it) }
             .avoidLeakingPersonalData(properties.jira)
             .build()

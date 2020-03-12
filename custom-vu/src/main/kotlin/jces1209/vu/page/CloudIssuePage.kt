@@ -9,11 +9,11 @@ import jces1209.vu.wait
 
 class CloudIssuePage(
     private val driver: WebDriver
-) {
+) : AbstractIssuePage {
     private val bentoSummary = By.cssSelector("[data-test-id='issue.views.issue-base.foundation.summary.heading']")
     private val classicSummary = By.id("key-val")
 
-    fun waitForSummary(): CloudIssuePage {
+    override fun waitForSummary(): CloudIssuePage {
         val jiraErrors = JiraErrors(driver)
         driver.wait(
             or(
@@ -26,7 +26,7 @@ class CloudIssuePage(
         return this
     }
 
-    fun comment(): Commenting {
+    override fun comment(): Commenting {
         return if (isCommentingClassic()) {
             ClassicCloudCommenting(driver)
         } else {

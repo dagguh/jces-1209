@@ -8,16 +8,20 @@ import com.atlassian.performance.tools.jiraactions.api.WebJira
 import com.atlassian.performance.tools.jiraactions.api.action.Action
 import com.atlassian.performance.tools.jiraactions.api.measure.ActionMeter
 import com.atlassian.performance.tools.jiraactions.api.memories.IssueKeyMemory
+import jces1209.vu.page.AbstractIssuePage
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import jces1209.vu.page.CloudIssuePage
 
+/**
+ * Works for both Cloud and Data Center.
+ */
 class WorkAnIssue(
-    private val issuePage: CloudIssuePage,
+    private val issuePage: AbstractIssuePage,
     private val jira: WebJira,
     private val meter: ActionMeter,
     private val issueKeyMemory: IssueKeyMemory,
     private val random: SeededRandom,
+    private val editProbability: Float,
     private val commentProbability: Float
 ) : Action {
     private val logger: Logger = LogManager.getLogger(this::class.java)
@@ -29,6 +33,9 @@ class WorkAnIssue(
             return
         }
         val loadedIssuePage = read(issueKey)
+        if (random.random.nextFloat() < editProbability) {
+            edit(loadedIssuePage)
+        }
         if (random.random.nextFloat() < commentProbability) {
             comment(loadedIssuePage)
         }
@@ -36,12 +43,16 @@ class WorkAnIssue(
 
     private fun read(
         issueKey: String
-    ) = meter.measure(VIEW_ISSUE) {
+    ): AbstractIssuePage = meter.measure(VIEW_ISSUE) {
         jira.goToIssue(issueKey)
         issuePage.waitForSummary()
     }
 
-    private fun comment(issuePage: CloudIssuePage) {
+    private fun edit(issuePage: AbstractIssuePage) {
+        logger.debug("I want to edit the $issuePage")
+    }
+
+    private fun comment(issuePage: AbstractIssuePage) {
         val commenting = issuePage.comment()
         meter.measure(ADD_COMMENT) {
             commenting.openEditor()
