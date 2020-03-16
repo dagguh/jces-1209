@@ -22,6 +22,8 @@ import java.io.File
 import java.net.URI
 import java.nio.file.Paths
 import java.time.Duration
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors.newCachedThreadPool
 
 class JiraPerformanceComparisonIT {
@@ -35,27 +37,35 @@ class JiraPerformanceComparisonIT {
 
     @Test
     fun shouldComparePerformance() {
-        val results = AbruptExecutorService(newCachedThreadPool()).use { pool ->
-            val baseline = pool.submitWithLogContext("baseline") {
-                benchmark(File("jira-baseline.properties"), JiraDcScenario::class.java)
-            }
-            val experiment = pool.submitWithLogContext("experiment") {
-                benchmark(File("jira-experiment.properties"), JiraCloudScenario::class.java)
-            }
-            listOf(baseline, experiment).map { it.get().prepareForJudgement(FullTimeline()) }
+        val results: List<EdibleResult> = AbruptExecutorService(newCachedThreadPool()).use { pool ->
+            listOf(
+                benchmark("a.properties", JiraDcScenario::class.java, pool),
+                benchmark("b.properties", JiraCloudScenario::class.java, pool)
+                // feel free to add more, e.g. benchmark("c.properties", ...
+            )
+                .map { it.get() }
+                .map { it.prepareForJudgement(FullTimeline()) }
         }
-        FullReport().dump(
-            results = results,
-            workspace = workspace.isolateTest("Compare")
-        )
+        FullReport().dump(results, workspace.isolateTest("Compare"))
         dumpMegaSlowWaterfalls(results)
     }
 
     private fun benchmark(
-        propertiesFile: File,
+        secretsName: String,
+        scenario: Class<out Scenario>,
+        pool: ExecutorService
+    ): CompletableFuture<RawCohortResult> {
+        val secretsFile = File("cohort-secrets/").resolve(secretsName)
+        val properties = CohortProperties.load(secretsFile)
+        return pool.submitWithLogContext(properties.cohort) {
+            benchmark(properties, scenario)
+        }
+    }
+
+    private fun benchmark(
+        properties: CohortProperties,
         scenario: Class<out Scenario>
     ): RawCohortResult {
-        val properties = CohortProperties.load(propertiesFile)
         val options = loadOptions(properties, scenario)
         val cohort = properties.cohort
         val resultsTarget = workspace.directory.resolve("vu-results").resolve(cohort)

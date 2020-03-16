@@ -9,9 +9,9 @@ class CohortProperties(
     val cohort: String
 ) {
     companion object {
-        fun load(file: File): CohortProperties {
+        fun load(secrets: File): CohortProperties {
             val properties = Properties()
-            file.bufferedReader().use { properties.load(it) }
+            secrets.bufferedReader().use { properties.load(it) }
             return CohortProperties(
                 jira = URI(properties.getProperty("jira.uri")!!),
                 userName = properties.getProperty("user.name")!!,

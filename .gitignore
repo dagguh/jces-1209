@@ -1,7 +1,6 @@
 .gradle
 build/
-jira-baseline.properties
-jira-experiment.properties
+cohort-secrets/
 virtual-users.log
 test-results
 diagnoses
