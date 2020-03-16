@@ -5,7 +5,8 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.auth.EC2ContainerCredentialsProviderWrapper
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.regions.Regions
+import com.amazonaws.regions.Regions.EU_WEST_1
+import com.amazonaws.regions.Regions.US_EAST_1
 import com.atlassian.performance.tools.aws.api.Aws
 import com.atlassian.performance.tools.aws.api.DependentResources
 import com.atlassian.performance.tools.aws.api.Investment
@@ -18,7 +19,7 @@ import com.atlassian.performance.tools.io.api.dereference
 import com.atlassian.performance.tools.io.api.ensureDirectory
 import java.nio.file.Path
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 class AwsVus : VirtualUsersSource {
@@ -74,7 +75,7 @@ class AwsVus : VirtualUsersSource {
         return DirectResultsTransport(resultsTarget)
     }
 
-    private fun prepareAws() = Aws.Builder(Regions.EU_WEST_1)
+    private fun prepareAws() = Aws.Builder(US_EAST_1)
         .credentialsProvider(
             AWSCredentialsProviderChain(
                 STSAssumeRoleSessionCredentialsProvider.Builder(
@@ -86,7 +87,7 @@ class AwsVus : VirtualUsersSource {
                 DefaultAWSCredentialsProviderChain()
             )
         )
-        .regionsWithHousekeeping(listOf(Regions.EU_WEST_1))
+        .regionsWithHousekeeping(listOf(EU_WEST_1, US_EAST_1)) // https://server-gdn-bamboo.internal.atlassian.com/browse/JIRA-JPTH
         .batchingCloudformationRefreshPeriod(Duration.ofSeconds(20))
         .build()
 }
