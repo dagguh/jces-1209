@@ -27,7 +27,7 @@ import java.util.concurrent.Executors.newCachedThreadPool
 class JiraPerformanceComparisonIT {
 
     private val workspace = RootWorkspace(Paths.get("build")).currentTask
-    private val benchmarkQuality: BenchmarkQuality = SlowAndMeaningful.Eager()
+    private val benchmarkQuality: BenchmarkQuality = SlowAndMeaningful()
 
     init {
         ConfigurationFactory.setConfigurationFactory(LogConfigurationFactory(workspace))

@@ -4,7 +4,6 @@ import com.atlassian.performance.tools.jiraactions.api.scenario.Scenario
 import com.atlassian.performance.tools.virtualusers.api.TemporalRate
 import com.atlassian.performance.tools.virtualusers.api.VirtualUserLoad
 import com.atlassian.performance.tools.virtualusers.api.browsers.Browser
-import com.atlassian.performance.tools.virtualusers.api.browsers.HeadlessChromeBrowser
 import com.atlassian.performance.tools.virtualusers.api.config.VirtualUserBehavior
 import jces1209.vu.EagerChromeBrowser
 import java.time.Duration
@@ -14,7 +13,7 @@ class SlowAndMeaningful private constructor(
 ) : BenchmarkQuality {
 
     constructor() : this(
-        HeadlessChromeBrowser::class.java
+        EagerChromeBrowser::class.java
     )
 
     override fun provide(): VirtualUsersSource = AwsVus()
@@ -31,8 +30,4 @@ class SlowAndMeaningful private constructor(
         .skipSetup(true)
         .seed(12345L)
         .build()
-
-    class Eager : BenchmarkQuality by SlowAndMeaningful(
-        EagerChromeBrowser::class.java
-    )
 }
