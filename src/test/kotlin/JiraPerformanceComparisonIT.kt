@@ -1,3 +1,4 @@
+import com.amazonaws.regions.Regions
 import com.atlassian.performance.tools.concurrency.api.AbruptExecutorService
 import com.atlassian.performance.tools.concurrency.api.submitWithLogContext
 import com.atlassian.performance.tools.jiraactions.api.scenario.Scenario
@@ -37,15 +38,23 @@ class JiraPerformanceComparisonIT {
 
     @Test
     fun shouldComparePerformance() {
-        val results: List<EdibleResult> = AbruptExecutorService(newCachedThreadPool()).use { pool ->
+        val usResults: List<EdibleResult> = AbruptExecutorService(newCachedThreadPool()).use { pool ->
             listOf(
-                benchmark("a.properties", JiraDcScenario::class.java, quality, pool),
-                benchmark("b.properties", JiraCloudScenario::class.java, quality, pool)
-                // feel free to add more, e.g. benchmark("c.properties", ...
+                benchmark("a.properties", JiraDcScenario::class.java, SlowAndMeaningful.Builder().region(Regions.US_EAST_1).build(), pool),
+                benchmark("b.properties", JiraCloudScenario::class.java, SlowAndMeaningful.Builder().region(Regions.US_EAST_1).build(), pool)
             )
                 .map { it.get() }
                 .map { it.prepareForJudgement(FullTimeline()) }
         }
+        val euResults: List<EdibleResult> = AbruptExecutorService(newCachedThreadPool()).use { pool ->
+            listOf(
+                benchmark("c.properties", JiraDcScenario::class.java, SlowAndMeaningful.Builder().region(Regions.EU_WEST_1).build(), pool),
+                benchmark("d.properties", JiraCloudScenario::class.java, SlowAndMeaningful.Builder().region(Regions.EU_WEST_1).build(), pool)
+            )
+                .map { it.get() }
+                .map { it.prepareForJudgement(FullTimeline()) }
+        }
+        val results = usResults + euResults
         FullReport().dump(results, workspace.isolateTest("Compare"))
         dumpMegaSlowWaterfalls(results)
     }
