@@ -29,7 +29,7 @@ import java.util.concurrent.Executors.newCachedThreadPool
 class JiraPerformanceComparisonIT {
 
     private val workspace = RootWorkspace(Paths.get("build")).currentTask
-    private val benchmarkQuality: BenchmarkQuality = SlowAndMeaningful()
+    private val quality: BenchmarkQuality = SlowAndMeaningful()
 
     init {
         ConfigurationFactory.setConfigurationFactory(LogConfigurationFactory(workspace))
@@ -39,8 +39,8 @@ class JiraPerformanceComparisonIT {
     fun shouldComparePerformance() {
         val results: List<EdibleResult> = AbruptExecutorService(newCachedThreadPool()).use { pool ->
             listOf(
-                benchmark("a.properties", JiraDcScenario::class.java, pool),
-                benchmark("b.properties", JiraCloudScenario::class.java, pool)
+                benchmark("a.properties", JiraDcScenario::class.java, quality, pool),
+                benchmark("b.properties", JiraCloudScenario::class.java, quality, pool)
                 // feel free to add more, e.g. benchmark("c.properties", ...
             )
                 .map { it.get() }
@@ -53,23 +53,25 @@ class JiraPerformanceComparisonIT {
     private fun benchmark(
         secretsName: String,
         scenario: Class<out Scenario>,
+        quality: BenchmarkQuality,
         pool: ExecutorService
     ): CompletableFuture<RawCohortResult> {
         val secretsFile = File("cohort-secrets/").resolve(secretsName)
         val properties = CohortProperties.load(secretsFile)
         return pool.submitWithLogContext(properties.cohort) {
-            benchmark(properties, scenario)
+            benchmark(properties, scenario, quality)
         }
     }
 
     private fun benchmark(
         properties: CohortProperties,
-        scenario: Class<out Scenario>
+        scenario: Class<out Scenario>,
+        quality: BenchmarkQuality
     ): RawCohortResult {
         val options = loadOptions(properties, scenario)
         val cohort = properties.cohort
         val resultsTarget = workspace.directory.resolve("vu-results").resolve(cohort)
-        val provisioned = benchmarkQuality
+        val provisioned = quality
             .provide()
             .obtainVus(resultsTarget, workspace.directory)
         val virtualUsers = provisioned.virtualUsers
@@ -94,7 +96,7 @@ class JiraPerformanceComparisonIT {
             userName = properties.userName,
             password = properties.userPassword
         )
-        val behavior = benchmarkQuality.behave(scenario)
+        val behavior = quality.behave(scenario)
             .let { VirtualUserBehavior.Builder(it) }
             .avoidLeakingPersonalData(properties.jira)
             .build()
