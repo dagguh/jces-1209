@@ -9,7 +9,7 @@ import com.atlassian.performance.tools.jiraactions.api.scenario.Scenario
 import jces1209.vu.action.BrowseCloudBoards
 import jces1209.vu.action.BrowseCloudProjects
 import jces1209.vu.action.CreateAnIssue
-import jces1209.vu.action.LogInWithCookie
+import jces1209.vu.action.LogInWithAtlassianId
 import jces1209.vu.action.SearchCloudJql
 import jces1209.vu.action.ViewCloudBoard
 import jces1209.vu.page.CloudIssuePage
@@ -23,7 +23,10 @@ class JiraCloudScenario : Scenario {
         meter: ActionMeter,
         userMemory: UserMemory
     ): Action {
-        return LogInWithCookie(jira, meter)
+        val user = userMemory
+            .recall()
+            ?: throw Exception("I cannot recall which user I am")
+        return LogInWithAtlassianId(user, jira, meter)
     }
 
     override fun getActions(
