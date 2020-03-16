@@ -37,7 +37,7 @@ class AwsVus : VirtualUsersSource {
             lifespan = Duration.ofMinutes(30)
         ).provision()
         val investment = Investment(
-            useCase = "Compare Jira Cloud vs DC",
+            useCase = "Compare two Jiras the Falcon way",
             lifespan = Duration.ofMinutes(30)
         )
         val network = NetworkFormula(
