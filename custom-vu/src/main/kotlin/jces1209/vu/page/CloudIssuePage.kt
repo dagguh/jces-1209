@@ -1,6 +1,5 @@
 package jces1209.vu.page
 
-import com.atlassian.performance.tools.jiraactions.api.page.JiraErrors
 import jces1209.vu.wait
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -14,15 +13,12 @@ class CloudIssuePage(
     private val classicSummary = By.id("key-val")
 
     override fun waitForSummary(): AbstractIssuePage {
-        val jiraErrors = JiraErrors(driver)
         driver.wait(
             or(
                 visibilityOfElementLocated(bentoSummary),
-                visibilityOfElementLocated(classicSummary),
-                jiraErrors.anyCommonError()
+                visibilityOfElementLocated(classicSummary)
             )
         )
-        jiraErrors.assertNoErrors()
         return this
     }
 

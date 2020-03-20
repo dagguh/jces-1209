@@ -1,6 +1,5 @@
 package jces1209.vu.page
 
-import com.atlassian.performance.tools.jiraactions.api.page.JiraErrors
 import com.atlassian.performance.tools.jiraactions.api.page.wait
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -14,7 +13,6 @@ class CloudIssueNavigator(
 ) {
 
     fun waitForNavigator() {
-        val jiraErrors = JiraErrors(driver)
         driver.wait(
             Duration.ofSeconds(30),
             or(
@@ -33,8 +31,7 @@ class CloudIssueNavigator(
                         presenceOfElementLocated(By.className("issue-body-content"))
                     )
                 ),
-                presenceOfElementLocated(By.className("no-results-hint")),
-                jiraErrors.anyCommonError()
+                presenceOfElementLocated(By.className("no-results-hint")) // TODO is it too optimistic like in SearchServerFilter.waitForIssueNavigator ?
             )
         )
     }
