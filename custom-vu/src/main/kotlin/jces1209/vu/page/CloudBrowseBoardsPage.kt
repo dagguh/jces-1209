@@ -2,6 +2,7 @@ package jces1209.vu.page
 
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.support.ui.ExpectedConditions
 import java.time.Duration
 
 class CloudBrowseBoardsPage(
@@ -12,7 +13,7 @@ class CloudBrowseBoardsPage(
     )
 
     private val falliblePage = FalliblePage.Builder(
-        expectedContent = listOf(tableLocator),
+        expectedContent = ExpectedConditions.visibilityOfElementLocated(tableLocator),
         webDriver = driver
     )
         .cloudErrors()

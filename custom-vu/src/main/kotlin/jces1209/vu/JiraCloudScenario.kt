@@ -10,6 +10,7 @@ import jces1209.vu.action.BrowseCloudBoards
 import jces1209.vu.action.BrowseCloudProjects
 import jces1209.vu.action.CreateAnIssue
 import jces1209.vu.action.LogInWithAtlassianId
+import jces1209.vu.action.LogInWithCookie
 import jces1209.vu.action.SearchCloudFilter
 import jces1209.vu.action.ViewCloudBoard
 import jces1209.vu.page.CloudIssuePage

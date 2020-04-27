@@ -1,6 +1,5 @@
 package jces1209.vu.page
 
-import com.atlassian.performance.tools.jiraactions.api.page.wait
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.support.ui.ExpectedConditions.and
@@ -9,12 +8,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocate
 import java.time.Duration
 
 class CloudIssueNavigator(
-    private val driver: WebDriver
+    driver: WebDriver
 ) {
-
-    fun waitForNavigator() {
-        driver.wait(
-            Duration.ofSeconds(30),
+    private val page = FalliblePage.Builder(
+            driver,
             or(
                 and(
                     or(
@@ -34,5 +31,11 @@ class CloudIssueNavigator(
                 presenceOfElementLocated(By.className("no-results-hint")) // TODO is it too optimistic like in SearchServerFilter.waitForIssueNavigator ?
             )
         )
+        .cloudErrors()
+        .timeout(Duration.ofSeconds(30))
+        .build()
+
+    fun waitForNavigator() {
+        page.waitForPageToLoad()
     }
 }

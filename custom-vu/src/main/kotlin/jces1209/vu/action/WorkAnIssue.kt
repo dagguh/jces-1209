@@ -2,6 +2,7 @@ package jces1209.vu.action
 
 import com.atlassian.performance.tools.jiraactions.api.ADD_COMMENT
 import com.atlassian.performance.tools.jiraactions.api.ADD_COMMENT_SUBMIT
+import com.atlassian.performance.tools.jiraactions.api.ActionType
 import com.atlassian.performance.tools.jiraactions.api.SeededRandom
 import com.atlassian.performance.tools.jiraactions.api.VIEW_ISSUE
 import com.atlassian.performance.tools.jiraactions.api.WebJira
@@ -9,8 +10,13 @@ import com.atlassian.performance.tools.jiraactions.api.action.Action
 import com.atlassian.performance.tools.jiraactions.api.measure.ActionMeter
 import com.atlassian.performance.tools.jiraactions.api.memories.IssueKeyMemory
 import jces1209.vu.page.AbstractIssuePage
+import jces1209.vu.wait
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.openqa.selenium.By
+import org.openqa.selenium.Keys
+import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.support.ui.ExpectedConditions
 
 /**
  * Works for both Cloud and Data Center.
@@ -57,10 +63,15 @@ class WorkAnIssue(
         meter.measure(ADD_COMMENT) {
             commenting.openEditor()
             commenting.typeIn("abc def")
+            meter.measure(MENTION_KEY) {
+                commenting.mention()
+            }
             meter.measure(ADD_COMMENT_SUBMIT) {
                 commenting.saveComment()
                 commenting.waitForTheNewComment()
             }
         }
     }
+
+    private val MENTION_KEY = ActionType("Mention") {}
 }

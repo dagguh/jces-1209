@@ -48,7 +48,7 @@ class ScenarioSimilarities(
             issueKeyMemory = issueKeyMemory,
             random = seededRandom,
             editProbability = 0.00f, // 0.10f when TODO fix the page objects for Cloud - tough due to Bento
-            commentProbability = 0.00f // 0.04f if we can mutate data
+            commentProbability = 1.00f // 0.04f if we can mutate data
         ),
         projectSummary = ProjectSummaryAction(
             jira = jira,
@@ -80,7 +80,7 @@ class ScenarioSimilarities(
         browseBoards: Action,
         viewBoard: Action
     ): List<Action> {
-        val exploreData = listOf(browseProjects, browseFilters, browseBoards)
+        val exploreData = listOf(browseBoards, viewBoard, workAnIssue)
         val spreadOut = mapOf(
             createIssue to 0, // 5 if we can mutate data
             searchWithJql to 20,

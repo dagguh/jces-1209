@@ -1,11 +1,13 @@
 package jces1209.vu.page
 
+import jces1209.vu.wait
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable
-import jces1209.vu.wait
 
 class BentoCommenting(
     private val driver: WebDriver
@@ -37,9 +39,40 @@ class BentoCommenting(
 
     override fun saveComment() {
         findSaveButton().click()
+        val lastComment = driver.findElement(By.cssSelector("[data-test-id='issue.activity.comments-list'] :last-child"))
+        lastComment
+            .findElements(By.xpath("*[contains(text(),'Saving...')]"))
+            .firstOrNull()
+            ?.let { lastCommentBeingSaved ->
+                driver.wait(ExpectedConditions.invisibilityOf(lastCommentBeingSaved))
+            }
     }
 
     override fun waitForTheNewComment() {
         waitForPlaceholder()
+    }
+
+    override fun mention() {
+        startMentioning()
+        waitForPopup()
+        selectUserToMention()
+    }
+
+    private fun startMentioning() {
+        Actions(driver)
+            .sendKeys(" @")
+            .perform()
+    }
+
+    private fun waitForPopup() {
+        driver.wait(
+            ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-mention-name]"))
+        )
+    }
+
+    private fun selectUserToMention() {
+        Actions(driver)
+            .sendKeys(Keys.ARROW_DOWN, Keys.ARROW_DOWN, Keys.ENTER)
+            .perform()
     }
 }

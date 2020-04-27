@@ -28,4 +28,8 @@ class DcCommenting(
     override fun waitForTheNewComment() {
         driver.wait(visibilityOfElementLocated(By.cssSelector(".activity-comment.focused")))
     }
+
+    override fun mention() {
+        TODO("Not yet implemented")
+    }
 }

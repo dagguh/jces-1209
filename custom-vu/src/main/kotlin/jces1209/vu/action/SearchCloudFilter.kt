@@ -13,6 +13,9 @@ class SearchCloudFilter(
     private val meter: ActionMeter,
     private val filters: Memory<URI>
 ) : Action {
+
+    private val brokenFilters = mutableSetOf<URI>()
+
     override fun run() {
         val filter = filters.recall()!!
         meter.measure(
