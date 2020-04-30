@@ -15,7 +15,7 @@ class SlowAndMeaningful private constructor(
     private val duration: Duration
 ) : BenchmarkQuality {
 
-    override fun provide(): VirtualUsersSource = AwsVus(duration, region)
+    override fun provide(): VirtualUsersSource = CustomVus()
 
     override fun behave(scenario: Class<out Scenario>): VirtualUserBehavior = VirtualUserBehavior.Builder(scenario)
         .browser(browser)
